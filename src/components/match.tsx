@@ -1,4 +1,5 @@
 import React from "react";
+import {useNavigate} from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { User } from "../types/user";
 
@@ -8,23 +9,23 @@ interface PropsType {
 
 const Match: React.FC<PropsType> = (props: PropsType) => {
     const { socket } = props;
+    const navigate = useNavigate();
     const [users, setUsers] = React.useState<User[]>([]);
     const [ready, setReady] = React.useState<boolean>(false);
     const [playerListEl, setPlayerListEl] = React.useState<JSX.Element[]>([]);
-    React.useEffect(() => {
-        init();
-    }, []);
 
     React.useEffect(() => {
         setPlayerListEl(() => users.map((user, i) => (<li key={i}>{user.nickname}</li>)));
     }, [users]);
-
+    
+    React.useEffect(() => {
+        init();
+    }, []);
     const init = () => {
         const nickname = String(prompt('닉네임을 입력해주세요'));
         socket.emit('join', {nickname});
 
         socket.on('join', data => {
-            console.log(data.users.map((user: string) => ({nickname: user})));
             setUsers(() => data.users.map((user: string) => ({nickname: user})));
         });
         
@@ -44,6 +45,9 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
 
         socket.on('game:ready', data => {
             setReady(() => true);
+            setTimeout(() => {
+                navigate('game');
+            }, 1500);
         });
     }
 
