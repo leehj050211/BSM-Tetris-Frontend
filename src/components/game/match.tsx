@@ -1,17 +1,15 @@
 import React from "react";
-import {useNavigate} from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { User } from "../types/user";
+import { User } from "../../types/user";
 
 interface PropsType {
     socket: Socket,
     username: string,
-    setUsername: React.Dispatch<React.SetStateAction<string>>
+    setPageMode: React.Dispatch<React.SetStateAction<string>>
 }
 
 const Match: React.FC<PropsType> = (props: PropsType) => {
     const { socket } = props;
-    const navigate = useNavigate();
     const [users, setUsers] = React.useState<User[]>([]);
     const [ready, setReady] = React.useState<boolean>(false);
     const [playerListEl, setPlayerListEl] = React.useState<JSX.Element[]>([]);
@@ -24,9 +22,7 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
         init();
     }, []);
     const init = () => {
-        const nickname = String(prompt('닉네임을 입력해주세요'));
-        props.setUsername(() => nickname);
-        socket.emit('join', {nickname});
+        socket.emit('join', {nickname: props.username});
 
         socket.on('join', data => {
             setUsers(() => data.users.map((user: string) => ({nickname: user})));
@@ -49,7 +45,7 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
         socket.on('game:ready', data => {
             setReady(() => true);
             setTimeout(() => {
-                navigate('game');
+                props.setPageMode('game');
             }, 1500);
         });
     }

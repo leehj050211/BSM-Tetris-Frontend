@@ -1,8 +1,8 @@
-import React from "react";
-import { Socket } from "socket.io-client";
-import * as game from '../util/game';
-import { User } from "../types/user";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { Socket } from 'socket.io-client';
+import * as game from '../../util/game';
+import { User } from '../../types/user';
+import { useNavigate } from 'react-router-dom';
 
 interface PropsType {
     socket: Socket,
@@ -77,9 +77,7 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
         });
 
         socket.on('game:spawn', data => {
-            console.log(data.nickname, data.tick);
-            const ctx = playerCanvasCtx[data.nickname];
-            game.draw(ctx, data.board);
+            console.log(data.nickname, data.tick, data.piece);
         });
 
         socket.on('game:softdrop', data => {
@@ -87,7 +85,13 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
             const ctx = playerCanvasCtx[data.nickname];
             game.draw(ctx, data.board);
         });
-
+        
+        socket.on('game:move', data => {
+            console.log(data.nickname, data.tick);
+            const ctx = playerCanvasCtx[data.nickname];
+            game.draw(ctx, data.board);
+        });
+        
         socket.on('error', data => {
             if (data == `You didn't joined the game`) {
                 navigate('/');
@@ -103,24 +107,38 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
     const gameKeyDownHandler = (event: React.KeyboardEvent) => {
         console.log(event.key)
         switch (event.key) {
-            case "ArrowLeft": {
+            case 'ArrowLeft': {
                 socket.emit('game', {
                     action: 'move',
                     data: 'left'
                 });
                 break;
             }
-            case "ArrowRight": {
+            case 'ArrowRight': {
                 socket.emit('game', {
                     action: 'move',
                     data: 'right'
                 });
                 break;
             }
-            case "ArrowDown": {
+            case 'ArrowDown': {
                 socket.emit('game', {
                     action: 'move',
                     data: 'down'
+                });
+                break;
+            }
+            case 'z': {
+                socket.emit('game', {
+                    action: 'rotate',
+                    data: 'left'
+                });
+                break;
+            }
+            case 'x': {
+                socket.emit('game', {
+                    action: 'rotate',
+                    data: 'right'
                 });
                 break;
             }
@@ -128,7 +146,7 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
     }
 
     return (
-        <div className="game">
+        <div className='game'>
             <div>
                 <canvas ref={canvasRefs.current[0]}></canvas>
                 <input 
@@ -138,7 +156,7 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
                 />
                 <p>{props.username}</p>
             </div>
-            <ul className="game--player-list">{playerListEl}</ul>
+            <ul className='game--player-list'>{playerListEl}</ul>
         </div>
     );
 }

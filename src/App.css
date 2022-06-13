@@ -1,38 +1,100 @@
 .App {
   text-align: center;
+  height: 100%;
+  background-color: var(--background);
+  color: var(--text);
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.App {
+    --black: #000;
+    --gray: #c0c0c0;
+    --light_gray:#aaa;
+    
+    --accent: #1188bb;
+    --text: #202124;
+    --text-level-1: #505154;
+    --text-level-2: #808184;
+
+    --background:  #ededed;
+  
+    --level-1: #f2f3f5;
+    --level-2: #ffffff;
+
+    --input:  rgba(192, 192, 192, .3);
+    --hover:  rgba(0, 0, 0, .2);
+}
+.App.dark {
+    --black: #000;
+    --gray: #525252;
+    --light_gray:#aaa;
+
+    --accent: #62cdfe;
+    --text: #e8eaed;
+    --text-level-1: #c7cad3;
+    --text-level-2: #8b8f94;
+    
+    --background:  #202124;
+
+    --level-1:  #303134;
+    --level-2:  #404144;
+
+    --input:  rgba(192, 192, 192, .3);
+    --hover: rgba(128, 128, 128, .2);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+ul,
+ol,
+li {
+  list-style: none;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+h1 {
+  font-size: 3.6rem;
 }
 
-.App-link {
-  color: #61dafb;
+h2 {
+  font-size: 3.2rem;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+h3 {
+  font-size: 2.6rem;
+}
+
+h4 {
+  font-size: 2.2rem;
+}
+
+p {
+  font-size: 1.5rem;
+}
+
+button {
+    width: auto;
+    color: var(--text);
+    border: none;
+    padding: 1.5rem 2.5rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: .75rem;
+    background-color: var(--level-2);
+    transition: .25s;
+}
+
+input {
+    border: none;
+    color: var(--text);
+    width: 30rem;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin: 1rem 0;
+    outline: .2rem solid #00000000;
+    padding: 1.5rem;
+    border-radius: .75rem;
+    background-color: var(--input);
+    text-align: left;
+    transition: .25s;
 }
