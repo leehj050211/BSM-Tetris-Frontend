@@ -4,7 +4,9 @@ import { Socket } from "socket.io-client";
 import { User } from "../types/user";
 
 interface PropsType {
-    socket: Socket
+    socket: Socket,
+    username: string,
+    setUsername: React.Dispatch<React.SetStateAction<string>>
 }
 
 const Match: React.FC<PropsType> = (props: PropsType) => {
@@ -23,6 +25,7 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
     }, []);
     const init = () => {
         const nickname = String(prompt('닉네임을 입력해주세요'));
+        props.setUsername(() => nickname);
         socket.emit('join', {nickname});
 
         socket.on('join', data => {

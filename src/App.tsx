@@ -9,16 +9,17 @@ const socket = io('http://localhost:3000', {
 });
 
 function App() {
-  return (
-    <div className="App">
-        <BrowserRouter>
-            <Routes>
-                <Route path={"/game"} element={<Game socket={socket} />}></Route>
-                <Route path={"/"} element={<Match socket={socket} />}></Route>
-            </Routes>
-        </BrowserRouter>
-    </div>
-  );
+    const [username, setUsername] = React.useState<string>('');
+    return (
+        <div className="App">
+            <BrowserRouter>
+                <Routes>
+                    <Route path={"/game"} element={<Game socket={socket} username={username} setUsername={setUsername} />}></Route>
+                    <Route path={"/"} element={<Match socket={socket} username={username} setUsername={setUsername} />}></Route>
+                </Routes>
+            </BrowserRouter>
+        </div>
+    );
 }
 
 export default App;
