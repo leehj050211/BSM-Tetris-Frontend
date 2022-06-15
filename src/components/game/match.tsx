@@ -1,4 +1,5 @@
 import React from "react";
+import '../../styles/game/match.css';
 import { Socket } from "socket.io-client";
 import { User } from "../../types/user";
 
@@ -15,7 +16,7 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
     const [playerListEl, setPlayerListEl] = React.useState<JSX.Element[]>([]);
 
     React.useEffect(() => {
-        setPlayerListEl(() => users.map((user, i) => (<li key={i}>{user.nickname}</li>)));
+        setPlayerListEl(() => users.map((user, i) => (<li key={i}><span className="match--player-name">{user.nickname}</span></li>)));
     }, [users]);
     
     React.useEffect(() => {
@@ -53,11 +54,11 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
     return (
         <div className="match">
             <div className="match--stat-box">
-                <p>{ready? '잠시 후 게임이 시작됩니다.': '플레이어를 기다리는 중...'} ({users.length}/4)</p>
-                <ul className="match--player-list">
-                    {playerListEl}
-                </ul>
+                <h4>{ready? '잠시 후 게임이 시작됩니다.': '플레이어를 기다리는 중...'} ({users.length}/2)</h4>
             </div>
+            <ul className="match--player-list">
+                {playerListEl}
+            </ul>
         </div>
     );
 }

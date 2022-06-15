@@ -5,7 +5,7 @@ import GameMain from './components/game/main';
 
 function App() {
     return (
-        <div className="App">
+        <div className="App dark">
             <BrowserRouter>
                 <Routes>
                     <Route path={"/"} element={<GameMain />}></Route>

@@ -1,7 +1,7 @@
 import React from 'react';
+import '../../styles/game/game.css';
 import { Socket } from 'socket.io-client';
 import * as game from '../../util/game';
-import { User } from '../../types/user';
 import { useNavigate } from 'react-router-dom';
 
 interface PropsType {
@@ -44,8 +44,10 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
                 });
                 return (
                     <li key={i}>
-                        <canvas ref={newCanvasRef}></canvas>
-                        <p>{nickname}</p>
+                        <div className='game--other-player-screen'>
+                            <canvas className='game--screen' ref={newCanvasRef}></canvas>
+                            <p className='game--player-nickname'>{nickname}</p>
+                        </div>
                     </li>
                 );
             }));
@@ -105,7 +107,6 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
     }, [start]);
 
     const gameKeyDownHandler = (event: React.KeyboardEvent) => {
-        console.log(event.key)
         switch (event.key) {
             case 'ArrowLeft': {
                 socket.emit('game', {
@@ -146,15 +147,21 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
     }
 
     return (
-        <div className='game'>
-            <div>
-                <canvas ref={canvasRefs.current[0]}></canvas>
-                <input 
+        <div 
+            className='game'
+            onClick={() => {
+                if (!start) return;
+                controllerRef.current?.focus();
+            }}>
+            <div className='game--player-screen'>
+                <canvas className='game--screen' ref={canvasRefs.current[0]}></canvas>
+                <input
                     readOnly 
                     ref={controllerRef} 
                     onKeyDown={gameKeyDownHandler}
+                    className='game--controller'
                 />
-                <p>{props.username}</p>
+                <p className='game--player-nickname'>{props.username}</p>
             </div>
             <ul className='game--player-list'>{playerListEl}</ul>
         </div>
