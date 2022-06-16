@@ -11,7 +11,6 @@ interface PropsType {
 }
 const BOARD_ROWS = 10;
 const BOARD_COLS = 20;
-const BLOCK_SIZE = 20;
 
 const Game: React.FC<PropsType> = (props: PropsType) => {
     const { socket } = props;
@@ -26,12 +25,25 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
     const playerCanvasCtx: {
         [index: string]: CanvasRenderingContext2D
     } = {};
+    const playerBoards: {
+        [index: string]: number[][];
+    } = {};
 
     React.useEffect(() => {
         init();
     }, []);
     const init = () => {
         playerCanvasRef[props.username] = canvasRefs.current[0];
+
+        window.addEventListener('resize', () => {
+            if (canvasRefs.current[0].current) {
+                game.resize(
+                    canvasRefs.current[0].current,
+                    playerCanvasCtx[props.username],
+                    playerBoards[props.username]
+                );
+            }
+        });
 
         socket.on('game:info', data => {
             const users = data.users.filter((nickname: string) => nickname != props.username);
@@ -58,14 +70,19 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
                         if (ref != playerCanvasRef[key]) {
                             return;
                         }
-                        const ctx = ref.current?.getContext('2d');
+                        if (!ref.current?.parentElement?.clientWidth) {
+                            return;
+                        }
+                        // 캔버스 컨텍스트 참조
+                        const ctx = ref.current.getContext('2d');
                         if (ctx) {
-                            // 캔버스 크기 계산
-                            ctx.canvas.width = BOARD_ROWS * BLOCK_SIZE;
-                            ctx.canvas.height = BOARD_COLS * BLOCK_SIZE;
-
-                            // 블럭 크기 변경
-                            ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
+                            // 보드 배열 초기화
+                            playerBoards[key] = Array.from(
+                                {length: BOARD_COLS}, () => Array.from(
+                                    {length: BOARD_ROWS}, () => 0
+                                )
+                            );
+                            game.resize(ref.current, ctx, playerBoards[key]);
                             playerCanvasCtx[key] = ctx;
                         }
                     })
@@ -79,17 +96,20 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
         });
 
         socket.on('game:spawn', data => {
-            console.log(data.nickname, data.tick, data.piece);
+            // console.log(data.nickname, data.tick, data.piece);
         });
 
         socket.on('game:softdrop', data => {
-            console.log(data.nickname, data.tick);
             const ctx = playerCanvasCtx[data.nickname];
             game.draw(ctx, data.board);
         });
         
         socket.on('game:move', data => {
-            console.log(data.nickname, data.tick);
+            const ctx = playerCanvasCtx[data.nickname];
+            game.draw(ctx, data.board);
+        });
+
+        socket.on('game:change', data => {
             const ctx = playerCanvasCtx[data.nickname];
             game.draw(ctx, data.board);
         });
@@ -143,6 +163,12 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
                 });
                 break;
             }
+            case 'c': {
+                socket.emit('game', {
+                    action: 'change'
+                });
+                break;
+            }
         }
     }
 
@@ -154,7 +180,9 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
                 controllerRef.current?.focus();
             }}>
             <div className='game--player-screen'>
-                <canvas className='game--screen' ref={canvasRefs.current[0]}></canvas>
+                <div className='game--canvas-wrap'>
+                    <canvas className='game--screen' ref={canvasRefs.current[0]}></canvas>
+                </div>
                 <input
                     readOnly 
                     ref={controllerRef} 

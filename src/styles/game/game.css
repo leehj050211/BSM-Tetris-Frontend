@@ -4,6 +4,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10rem;
 }
 
 .game--screen {
@@ -22,6 +23,21 @@
 }
 
 .game--player-screen
+.game--canvas-wrap {
+    max-width: 350px;
+    max-height: 700px;
+}
+
+.game--player-screen
+:is(
+    .game--canvas-wrap,
+    .game--screen
+) {
+    width: 100%;
+    height: 100%;
+}
+
+.game--player-screen
 .game--player-nickname {
     font-weight: bold;
 }
@@ -29,8 +45,10 @@
 
 .game--other-player-screen,
 .game--player-screen {
+    height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
 .game--screen {
@@ -38,6 +56,9 @@
 }
 
 .game--player-list {
-    display: flex;
+    max-width: 400px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
     gap: 1rem;
 }
