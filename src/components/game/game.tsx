@@ -1,18 +1,17 @@
 import React from 'react';
 import '../../styles/game/game.css';
 import { Socket } from 'socket.io-client';
-import * as game from '../../util/game';
 import { useNavigate } from 'react-router-dom';
+import { Game } from '../../util/game';
 
 interface PropsType {
     socket: Socket,
     username: string,
     setUsername: React.Dispatch<React.SetStateAction<string>>
 }
-const BOARD_ROWS = 10;
-const BOARD_COLS = 20;
 
-const Game: React.FC<PropsType> = (props: PropsType) => {
+const GameComponent: React.FC<PropsType> = (props: PropsType) => {
+    const game = new Game();
     const { socket } = props;
     const navigate = useNavigate();
     const [start, setStart] = React.useState<boolean>(false);
@@ -22,12 +21,6 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
     const [playerCanvasRef, setPlayerCanvasRef] = React.useState<{
         [index: string]: React.RefObject<HTMLCanvasElement>
     }>({});
-    const playerCanvasCtx: {
-        [index: string]: CanvasRenderingContext2D
-    } = {};
-    const playerBoards: {
-        [index: string]: number[][];
-    } = {};
 
     React.useEffect(() => {
         init();
@@ -37,11 +30,7 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
 
         window.addEventListener('resize', () => {
             if (canvasRefs.current[0].current) {
-                game.resize(
-                    canvasRefs.current[0].current,
-                    playerCanvasCtx[props.username],
-                    playerBoards[props.username]
-                );
+                game.resizeScreen(canvasRefs.current[0].current, props.username);
             }
         });
 
@@ -65,9 +54,9 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
             }));
 
             setTimeout(() => {
-                Object.keys(playerCanvasRef).forEach(key => {
+                Object.keys(playerCanvasRef).forEach(username => {
                     canvasRefs.current.forEach(ref => {
-                        if (ref != playerCanvasRef[key]) {
+                        if (ref != playerCanvasRef[username]) {
                             return;
                         }
                         if (!ref.current?.parentElement?.clientWidth) {
@@ -76,42 +65,45 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
                         // 캔버스 컨텍스트 참조
                         const ctx = ref.current.getContext('2d');
                         if (ctx) {
-                            // 보드 배열 초기화
-                            playerBoards[key] = Array.from(
-                                {length: BOARD_COLS}, () => Array.from(
-                                    {length: BOARD_ROWS}, () => 0
-                                )
-                            );
-                            game.resize(ref.current, ctx, playerBoards[key]);
-                            playerCanvasCtx[key] = ctx;
+                            game.initData(username);
+                            game.setCtx(username, ctx);
+                            game.resizeScreen(ref.current, username);
                         }
                     })
                 })
-                setStart(() => true);
-            }, 100);
+            }, 1);
         });
-
+        
         socket.on('game:start', data => {
-            console.log('start');
+            setStart(() => true);
         });
 
         socket.on('game:spawn', data => {
-            // console.log(data.nickname, data.tick, data.piece);
+            game.spawnPiece(data.username, data.pieceId, data.x, data.y);
+        });
+        
+        socket.on('game:softdrop', data => {
+            game.softdrop(data.username, data.y);
         });
 
-        socket.on('game:softdrop', data => {
-            const ctx = playerCanvasCtx[data.nickname];
-            game.draw(ctx, data.board);
+        socket.on('game:stack', data => {
+            game.stack(data.username, data.y);
         });
         
         socket.on('game:move', data => {
-            const ctx = playerCanvasCtx[data.nickname];
-            game.draw(ctx, data.board);
+            game.move(data.username, data.x, data.y);
+        });
+
+        socket.on('game:rotate', data => {
+            game.rotatePiece(data.username, data.direction);
         });
 
         socket.on('game:change', data => {
-            const ctx = playerCanvasCtx[data.nickname];
-            game.draw(ctx, data.board);
+            game.changePiece(data.username, data.holdPieceId, data.pieceId, data.pieceX, data.pieceY);
+        });
+
+        socket.on('game:clear', data => {
+            game.clear(data.username, data.y);
         });
         
         socket.on('error', data => {
@@ -196,4 +188,4 @@ const Game: React.FC<PropsType> = (props: PropsType) => {
     );
 }
 
-export default Game;
+export default GameComponent;

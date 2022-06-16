@@ -16,29 +16,29 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
     const [playerListEl, setPlayerListEl] = React.useState<JSX.Element[]>([]);
 
     React.useEffect(() => {
-        setPlayerListEl(() => users.map((user, i) => (<li key={i}><span className="match--player-name">{user.nickname}</span></li>)));
+        setPlayerListEl(() => users.map((user, i) => (<li key={i}><span className="match--player-name">{user.username}</span></li>)));
     }, [users]);
     
     React.useEffect(() => {
         init();
     }, []);
     const init = () => {
-        socket.emit('join', {nickname: props.username});
+        socket.emit('join', {username: props.username});
 
         socket.on('join', data => {
-            setUsers(() => data.users.map((user: string) => ({nickname: user})));
+            setUsers(() => data.users.map((user: string) => ({username: user})));
         });
         
-        socket.on('user:join', nickname => {
+        socket.on('user:join', username => {
             setUsers((prev) => [
                 ...prev,
-                {nickname}
+                {username}
             ]);
         });
         
-        socket.on('user:exit', nickname => {
+        socket.on('user:exit', username => {
             setUsers((prev) => {
-                prev = prev.filter(user => user.nickname != nickname);
+                prev = prev.filter(user => user.username != username);
                 return prev;
             });
         });
