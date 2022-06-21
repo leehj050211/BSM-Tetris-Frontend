@@ -87,7 +87,7 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
         });
 
         socket.on('game:stack', data => {
-            game.stack(data.username, data.y);
+            game.stack(data.username, data.board);
         });
         
         socket.on('game:move', data => {

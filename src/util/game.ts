@@ -94,12 +94,10 @@ export class Game {
         this.draw(ctx, this.renderPiece(gameData));
     }
     
-    stack(username: string, y: number) {
+    // 블록이 쌓였으면 서버와 데이터를 동기화하여 무결성 체크
+    stack(username: string, board: number[][]) {
         const ctx = this.playerCanvasCtx[username];
         const gameData = this.gameDatas[username];
-        if (!gameData.piece) return;
-        gameData.piece.y = y;
-        const board = this.renderPiece(gameData);
         gameData.board = board;
         this.draw(ctx, board);
     }
@@ -117,7 +115,6 @@ export class Game {
         const ctx = this.playerCanvasCtx[username];
         const newPiece = new Piece(pieceId, x, y);
         const gameData = this.gameDatas[username];
-        console.log(this.gameDatas)
         gameData.piece = newPiece;
         this.draw(ctx, this.renderPiece(gameData));
     }
