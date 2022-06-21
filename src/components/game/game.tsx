@@ -108,8 +108,9 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
         
         socket.on('error', data => {
             if (data == `You didn't joined the game`) {
-                navigate('/');
+                return navigate('/');
             }
+            alert(data);
         });
     }
 

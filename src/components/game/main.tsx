@@ -16,7 +16,7 @@ const GameMain: React.FC = () => {
     const rederPage = (pageMode: string): JSX.Element => {
         switch (pageMode) {
             case 'title': {
-                return (<TitleScreen setUsername={setUsername} setPageMode={setPageMode} />)
+                return (<TitleScreen socket={socket} setUsername={setUsername} setPageMode={setPageMode} />)
             }
             case 'match': {
                 return (<Match socket={socket} username={username} setPageMode={setPageMode} />)
