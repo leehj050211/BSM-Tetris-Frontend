@@ -46,7 +46,9 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
                 return (
                     <li key={i}>
                         <div className='game--other-player-screen'>
-                            <canvas className='game--screen' ref={newCanvasRef}></canvas>
+                            <div className='game--canvas-wrap'>
+                                <canvas className='game--screen' ref={newCanvasRef}></canvas>
+                            </div>
                             <p className='game--player-nickname'>{nickname}</p>
                         </div>
                     </li>
@@ -105,6 +107,11 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
         socket.on('game:clear', data => {
             game.clear(data.username, data.y);
         });
+
+        socket.on('game:gameover', data => {
+            game.stack(data.username, data.board);
+            playerCanvasRef[data.username]?.current?.parentElement?.classList.add('gameover');
+        });
         
         socket.on('error', data => {
             if (data == `You didn't joined the game`) {
@@ -159,6 +166,12 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
             case 'c': {
                 socket.emit('game', {
                     action: 'change'
+                });
+                break;
+            }
+            case ' ': {
+                socket.emit('game', {
+                    action: 'harddrop'
                 });
                 break;
             }
