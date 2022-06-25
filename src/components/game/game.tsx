@@ -3,6 +3,7 @@ import '../../styles/game/game.css';
 import { Socket } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import { Game } from '../../util/game';
+import PlayerScreen from './player';
 
 interface PropsType {
     socket: Socket,
@@ -10,11 +11,22 @@ interface PropsType {
     setUsername: React.Dispatch<React.SetStateAction<string>>
 }
 
+interface GameInfo {
+    level: number,
+    tickRate: number,
+    tick: number
+}
+
 const GameComponent: React.FC<PropsType> = (props: PropsType) => {
     const game = new Game();
     const { socket } = props;
     const navigate = useNavigate();
     const [start, setStart] = React.useState<boolean>(false);
+    const [gameInfo, setGameInfo] = React.useState<GameInfo>({
+        level: 0,
+        tickRate: 0,
+        tick: 0
+    });
     const [playerListEl, setPlayerListEl] = React.useState<JSX.Element[]>([]);
     const controllerRef = React.useRef<HTMLInputElement>(null);
     const canvasRefs = React.useRef<React.RefObject<HTMLCanvasElement>[]>([React.createRef<HTMLCanvasElement>()]);
@@ -35,30 +47,32 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
         });
 
         socket.on('game:info', data => {
-            const users = data.users.filter((nickname: string) => nickname != props.username);
-            setPlayerListEl(() => users.map((nickname: string, i: number) => {
+            setGameInfo({
+                level: data.level,
+                tickRate: data.tickRate,
+                tick: data.tick
+            });
+
+            const users = data.users.filter((username: string) => username !== props.username);
+            setPlayerListEl(() => users.map((username: string, i: number) => {
                 const newCanvasRef = React.createRef<HTMLCanvasElement>();
                 canvasRefs.current[i+1] = newCanvasRef;
                 setPlayerCanvasRef(prev => {
-                    prev[nickname] = newCanvasRef;
+                    prev[username] = newCanvasRef;
                     return prev;
                 });
-                return (
-                    <li key={i}>
-                        <div className='game--other-player-screen'>
-                            <div className='game--canvas-wrap'>
-                                <canvas className='game--screen' ref={newCanvasRef}></canvas>
-                            </div>
-                            <p className='game--player-nickname'>{nickname}</p>
-                        </div>
-                    </li>
-                );
+                return <PlayerScreen 
+                            key={username}
+                            username={username}
+                            ranking={0}
+                            canvasRef={newCanvasRef}
+                        />
             }));
 
             setTimeout(() => {
                 Object.keys(playerCanvasRef).forEach(username => {
                     canvasRefs.current.forEach(ref => {
-                        if (ref != playerCanvasRef[username]) {
+                        if (ref !== playerCanvasRef[username]) {
                             return;
                         }
                         if (!ref.current?.parentElement?.clientWidth) {
@@ -85,10 +99,16 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
         });
         
         socket.on('game:softdrop', data => {
+            if (data.tick !== gameInfo.tick) {
+                setGameInfo(prev => ({...prev, tick: data.tick}));
+            }
             game.softdrop(data.username, data.y);
         });
 
         socket.on('game:stack', data => {
+            if (data.tick !== gameInfo.tick) {
+                setGameInfo(prev => ({...prev, tick: data.tick}));
+            }
             game.stack(data.username, data.board);
         });
         
@@ -109,12 +129,23 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
         });
 
         socket.on('game:gameover', data => {
+            if (data.tick !== gameInfo.tick) {
+                setGameInfo(prev => ({...prev, tick: data.tick}));
+            }
             game.stack(data.username, data.board);
-            playerCanvasRef[data.username]?.current?.parentElement?.classList.add('gameover');
+            game.ranking(data.username, data.ranking);
+        });
+
+        socket.on('game:level', data => {
+            setGameInfo({
+                level: data.level,
+                tickRate: data.tickRate,
+                tick: data.tick
+            });
         });
         
         socket.on('error', data => {
-            if (data == `You didn't joined the game`) {
+            if (data === `You didn't joined the game`) {
                 return navigate('/');
             }
             alert(data);
@@ -185,6 +216,11 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
                 if (!start) return;
                 controllerRef.current?.focus();
             }}>
+            <ul className='game--info-box'>
+                <li>Level: {gameInfo.level}</li>
+                <li>Tick: {gameInfo.tick}</li>
+                <li>TickRate: {gameInfo.tickRate}</li>
+            </ul>
             <div className='game--player-screen'>
                 <div className='game--canvas-wrap'>
                     <canvas className='game--screen' ref={canvasRefs.current[0]}></canvas>
@@ -195,7 +231,7 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
                     onKeyDown={gameKeyDownHandler}
                     className='game--controller'
                 />
-                <p className='game--player-nickname'>{props.username}</p>
+                <p className='game--player-username'>{props.username}</p>
             </div>
             <ul className='game--player-list'>{playerListEl}</ul>
         </div>

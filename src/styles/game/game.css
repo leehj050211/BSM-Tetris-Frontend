@@ -7,6 +7,17 @@
     gap: 10rem;
 }
 
+.game--info-box {
+    position: absolute;
+    z-index: 2;
+    bottom: 1rem;
+    left:  1rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    background-color: var(--level-2);
+    font-size: 1.4rem;
+}
+
 .game--screen {
     background-color: var(--level-1);
 }
@@ -44,13 +55,13 @@
     position: relative;
 }
 
-.game--canvas-wrap.gameover::before {
+.game--canvas-wrap
+.ranking {
     position: absolute;
     z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    content: 'Game Over';
     color: white;
     font-weight: bold;
     font-size: 2rem;
@@ -60,7 +71,8 @@
 }
 
 .game--player-screen
-.game--canvas-wrap.gameover::before {
+.game--canvas-wrap
+.ranking {
     font-size: 3rem;
 }
 

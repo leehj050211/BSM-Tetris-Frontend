@@ -5,26 +5,28 @@ export class Game {
     private gameDatas: {
         [index: string]: UserGameData;
     } = {};
-    private playerCanvasCtx: {
-        [index: string]: CanvasRenderingContext2D
+    private playerCanvas: {
+        [index: string]: {
+            ctx: CanvasRenderingContext2D,
+            BlockSize: number;
+        }
     } = {};
     
     private readonly BOARD_ROWS = 10;
     private readonly BOARD_COLS = 20;
-    private BLOCK_SIZE = 20;
 
     resizeScreen(ref: HTMLCanvasElement, username: string) {
         if (!ref.parentElement?.clientWidth) {
             return;
         }
-        const ctx = this.playerCanvasCtx[username];
+        const canvas = this.playerCanvas[username];
+        const { ctx } = canvas;
         // 캔버스 크기 계산
         ctx.canvas.width = ref.parentElement.clientWidth;
-        this.BLOCK_SIZE = ctx.canvas.width / this.BOARD_ROWS;
-        ctx.canvas.height = this.BOARD_COLS * this.BLOCK_SIZE;
+        canvas.BlockSize = ctx.canvas.width / this.BOARD_ROWS;
+        ctx.canvas.height = this.BOARD_COLS * canvas.BlockSize;
         // 블럭 크기 변경
-        ctx.scale(this.BLOCK_SIZE, this.BLOCK_SIZE);
-        this.draw(ctx, this.renderPiece(this.gameDatas[username]));
+        this.draw(canvas, this.renderPiece(this.gameDatas[username]));
     }
 
     initData(username: string) {
@@ -39,7 +41,10 @@ export class Game {
 
     // 캔버스 컨텍스트 저장
     setCtx(username: string, ctx: CanvasRenderingContext2D) {
-        this.playerCanvasCtx[username] = ctx;
+        this.playerCanvas[username] = {
+            ctx,
+            BlockSize: 0
+        };
     }
 
     private renderPiece(userGameData: UserGameData): number[][] {
@@ -52,7 +57,7 @@ export class Game {
                 if (i < 0) {
                     continue;
                 }
-                if (piece.shape[i-piece.y][j-piece.x] != 0) {
+                if (piece.shape[i-piece.y][j-piece.x] !== 0) {
                     board[i][j] = piece.id;
                 }
             }
@@ -60,7 +65,11 @@ export class Game {
         return board;
     }
     
-    private draw (ctx: CanvasRenderingContext2D, board: number[][]) {
+    private draw (canvas: {
+        ctx: CanvasRenderingContext2D,
+        BlockSize: number
+    }, board: number[][]) {
+        const { ctx, BlockSize } = canvas;
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         const colors = [
             '#40E0D0',
@@ -75,7 +84,12 @@ export class Game {
             data.forEach((value, x) => {
                 if (value > 0) {
                     ctx.fillStyle = colors[value-1];
-                    ctx.fillRect(x, y, 1, 1);
+                    ctx.fillRect(
+                        x * BlockSize,
+                        y * BlockSize,
+                        BlockSize,
+                        BlockSize
+                    );
                 }
             });
         });
@@ -87,62 +101,74 @@ export class Game {
     }
 
     softdrop(username: string, y: number) {
-        const ctx = this.playerCanvasCtx[username];
+        const canvas = this.playerCanvas[username];
         const gameData = this.gameDatas[username];
         if (!gameData.piece) return;
         gameData.piece.y = y;
-        this.draw(ctx, this.renderPiece(gameData));
+        this.draw(canvas, this.renderPiece(gameData));
     }
     
     // 블록이 쌓였으면 서버와 데이터를 동기화하여 무결성 체크
     stack(username: string, board: number[][]) {
-        const ctx = this.playerCanvasCtx[username];
+        const canvas = this.playerCanvas[username];
         const gameData = this.gameDatas[username];
         gameData.board = board;
-        this.draw(ctx, board);
+        this.draw(canvas, board);
     }
 
     move(username: string, x: number, y: number) {
-        const ctx = this.playerCanvasCtx[username];
+        const canvas = this.playerCanvas[username];
         const gameData = this.gameDatas[username];
         if (!gameData.piece) return;
         gameData.piece.x = x;
         gameData.piece.y = y;
-        this.draw(ctx, this.renderPiece(gameData));
+        this.draw(canvas, this.renderPiece(gameData));
     }
 
     spawnPiece(username: string, pieceId: number, x: number, y: number) {
-        const ctx = this.playerCanvasCtx[username];
+        const canvas = this.playerCanvas[username];
         const newPiece = new Piece(pieceId, x, y);
         const gameData = this.gameDatas[username];
         gameData.piece = newPiece;
-        this.draw(ctx, this.renderPiece(gameData));
+        this.draw(canvas, this.renderPiece(gameData));
     }
 
     rotatePiece(username: string, direction: string) {
-        const ctx = this.playerCanvasCtx[username];
+        const canvas = this.playerCanvas[username];
         const gameData = this.gameDatas[username];
         if (!gameData.piece) return;
         gameData.piece.rotate(direction);
-        this.draw(ctx, this.renderPiece(gameData));
+        this.draw(canvas, this.renderPiece(gameData));
     }
 
     changePiece(username: string, holdPieceId: number, pieceId: number, pieceX: number, pieceY: number) {
-        const ctx = this.playerCanvasCtx[username];
+        const canvas = this.playerCanvas[username];
         const gameData = this.gameDatas[username];
         if (!gameData.piece) return;
         gameData.holdPieceId = holdPieceId;
         gameData.piece = new Piece(pieceId, pieceX, pieceY);
         const board = this.renderPiece(gameData);
-        this.draw(ctx, board);
+        this.draw(canvas, board);
     }
 
     clear(username: string, y: number) {
-        const ctx = this.playerCanvasCtx[username];
+        const canvas = this.playerCanvas[username];
         const gameData = this.gameDatas[username];
         const { board } = gameData;
         board.splice(y, 1);
         board.unshift(Array.from({length: this.BOARD_ROWS}, () => 0));
-        this.draw(ctx, board);
+        this.draw(canvas, board);
+    }
+
+    ranking(username: string, ranking: number) {
+        const canvas = this.playerCanvas[username];
+        const { ctx, BlockSize } = canvas;
+        ctx.font = `bold ${BlockSize * 0.75}pt 맑은고딕`;
+        ctx.fillStyle = 'rgba(0, 0, 0, .5)';
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${ranking} 위`, ctx.canvas.width / 2, ctx.canvas.height / 2);
     }
 }

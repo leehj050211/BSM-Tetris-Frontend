@@ -3,7 +3,7 @@ export class Piece {
     y: number = 0;
     id: number = 0;
     shape: number[][] = [];
-    
+
     constructor(id: number, x: number, y: number) {
       this.init(id, x, y);
     }
@@ -55,7 +55,7 @@ export class Piece {
         // 새로운 배열에 기존 모양을 회전해서 채워 넣음
         for (let i=0; i<this.shape.length; i++) {
             for (let j=0; j<this.shape[0].length; j++) {
-                if (this.shape[i][j] == 0) continue;
+                if (this.shape[i][j] === 0) continue;
                 // 방향
                 switch (direction) {
                     case 'left': {
