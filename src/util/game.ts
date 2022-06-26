@@ -171,4 +171,9 @@ export class Game {
         ctx.textBaseline = 'middle';
         ctx.fillText(`${ranking} 위`, ctx.canvas.width / 2, ctx.canvas.height / 2);
     }
+
+    userExit(username: string) {
+        delete this.gameDatas[username];
+        delete this.playerCanvas[username];
+    }
 }

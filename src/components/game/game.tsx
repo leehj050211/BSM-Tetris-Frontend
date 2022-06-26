@@ -89,6 +89,15 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
                 })
             }, 1);
         });
+
+        socket.on('user:exit', username => {
+            setPlayerListEl(prev => prev.filter(player => player.key != username));
+            setPlayerCanvasRef(prev => {
+                delete prev[username];
+                return prev;
+            });
+            game.userExit(username);
+        });
         
         socket.on('game:start', data => {
             setStart(() => true);
