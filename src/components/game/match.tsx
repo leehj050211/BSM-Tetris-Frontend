@@ -14,10 +14,10 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
     const [users, setUsers] = React.useState<User[]>([]);
     const [roomInfo, setRoomInfo] = React.useState<{
         roomId: string,
-        maxUsers: number
+        maxPlayers: number
     }>({
         roomId: '',
-        maxUsers: 0
+        maxPlayers: 0
     });
     const [ready, setReady] = React.useState<boolean>(false);
     const [playerListEl, setPlayerListEl] = React.useState<JSX.Element[]>([]);
@@ -34,19 +34,19 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
         socket.on('room:info', data => {
             setRoomInfo({
                 roomId: data.roomId,
-                maxUsers: data.maxUsers
+                maxPlayers: data.maxPlayers
             });
-            setUsers(data.users.map((user: string) => ({username: user})));
+            setUsers(data.players.map((user: string) => ({username: user})));
         });
         
-        socket.on('room:user-join', username => {
+        socket.on('room:player-join', username => {
             setUsers((prev) => [
                 ...prev,
                 {username}
             ]);
         });
         
-        socket.on('user:exit', username => {
+        socket.on('player:exit', username => {
             setUsers((prev) => {
                 prev = prev.filter(user => user.username != username);
                 return prev;
@@ -71,7 +71,7 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
     return (
         <div className="match">
             <div className="match--stat-box">
-                <h4>{ready? '잠시 후 게임이 시작됩니다.': '플레이어를 기다리는 중...'} ({users.length}/{roomInfo.maxUsers})</h4>
+                <h4>{ready? '잠시 후 게임이 시작됩니다.': '플레이어를 기다리는 중...'} ({users.length}/{roomInfo.maxPlayers})</h4>
             </div>
             <ul className="match--player-list">
                 {playerListEl}

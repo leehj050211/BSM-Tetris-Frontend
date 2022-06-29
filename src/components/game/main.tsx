@@ -5,24 +5,39 @@ import TitleScreen from "./title-screen";
 import Match from "./match";
 import Game from "./game";
 
-const socket = io('http://localhost:3000', {
+const socket = io('/', {
     transports: ['websocket']
 });
 
 const GameMain: React.FC = () => {
     const [pageMode, setPageMode] = React.useState<string>('title');
+    const [isLogin, setIsLogin] = React.useState<boolean>(false);
     const [username, setUsername] = React.useState<string>('');
-
+    
     const rederPage = (pageMode: string): JSX.Element => {
         switch (pageMode) {
             case 'title': {
-                return (<TitleScreen socket={socket} setUsername={setUsername} setPageMode={setPageMode} />)
+                return (<TitleScreen
+                            socket={socket}
+                            isLogin={isLogin}
+                            setIsLogin={setIsLogin}
+                            setUsername={setUsername}
+                            setPageMode={setPageMode}
+                        />);
             }
             case 'match': {
-                return (<Match socket={socket} username={username} setPageMode={setPageMode} />)
+                return (<Match
+                            socket={socket}
+                            username={username}
+                            setPageMode={setPageMode}
+                        />);
             }
             case 'game': {
-                return (<Game socket={socket} username={username} setUsername={setUsername} />)
+                return (<Game 
+                            socket={socket}
+                            username={username}
+                            setUsername={setUsername}
+                        />);
             }
             default: {
                 return (<h1>Error: Page Error</h1>);

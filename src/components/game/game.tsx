@@ -53,8 +53,8 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
                 tick: data.tick
             });
 
-            const users = data.users.filter((username: string) => username !== props.username);
-            setPlayerListEl(() => users.map((username: string, i: number) => {
+            const players = data.players.filter((username: string) => username !== props.username);
+            setPlayerListEl(() => players.map((username: string, i: number) => {
                 const newCanvasRef = React.createRef<HTMLCanvasElement>();
                 canvasRefs.current[i+1] = newCanvasRef;
                 setPlayerCanvasRef(prev => {
@@ -90,7 +90,7 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
             }, 1);
         });
 
-        socket.on('user:exit', username => {
+        socket.on('player:exit', (username: string) => {
             setPlayerListEl(prev => prev.filter(player => player.key != username));
             setPlayerCanvasRef(prev => {
                 delete prev[username];
@@ -99,7 +99,7 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
             game.userExit(username);
         });
         
-        socket.on('game:start', data => {
+        socket.on('game:start', () => {
             setStart(() => true);
         });
 
