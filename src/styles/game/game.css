@@ -11,7 +11,8 @@
     position: absolute;
     z-index: 2;
     bottom: 1rem;
-    left:  1rem;
+    left:  50%;
+    transform: translateX(-50%);
     padding: 1rem;
     border-radius: 1rem;
     background-color: var(--level-2);

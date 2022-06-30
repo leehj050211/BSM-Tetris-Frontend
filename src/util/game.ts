@@ -163,13 +163,13 @@ export class Game {
     ranking(username: string, ranking: number) {
         const canvas = this.playerCanvas[username];
         const { ctx, BlockSize } = canvas;
-        ctx.font = `bold ${BlockSize * 0.75}pt 맑은고딕`;
+        ctx.font = `bold ${BlockSize * 0.75}pt NotoSans`;
         ctx.fillStyle = 'rgba(0, 0, 0, .5)';
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.fillStyle = '#FFFFFF';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(`${ranking} 위`, ctx.canvas.width / 2, ctx.canvas.height / 2);
+        ctx.fillText(`${ranking}위`, ctx.canvas.width / 2, ctx.canvas.height / 2);
     }
 
     userExit(username: string) {

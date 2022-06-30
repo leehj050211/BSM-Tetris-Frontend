@@ -1,0 +1,46 @@
+.ranking-main {
+    display: flex;
+    justify-content: center;
+}
+
+.my-rank {
+    position: fixed;
+    z-index: 1;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem;
+    background-color: var(--level-2);
+    border-radius: 1rem;
+}
+
+.ranking-list {
+    width: 100%;
+    max-width: 72rem;
+    background-color: var(--level-1);
+    border-radius: 1rem;
+    font-size: 1.8rem;
+}
+
+.ranking-list li {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 1rem 2rem;
+    gap: 2rem;
+}
+
+.ranking-list .ranking--rank {
+    font-weight: bold;
+    font-size: 2.2rem;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    background-color: var(--level-2);
+}
+
+.ranking-list .ranking--username {
+    text-align: left;
+    font-weight: bold;
+    flex: 1;
+}

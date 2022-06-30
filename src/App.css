@@ -72,6 +72,17 @@ a {
     text-decoration: none;
 }
 
+@font-face {
+    font-family: 'NotoSans';
+    font-weight: normal;
+    src: url('../public/fonts/NotoSansKR-Regular.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'NotoSans';
+    font-weight: bold;
+    src: url('../public/fonts/NotoSansKR-Bold.woff2') format('woff2');
+}
+
 button {
     width: auto;
     color: var(--text);
@@ -101,4 +112,26 @@ input {
     background-color: var(--input);
     text-align: left;
     transition: .25s;
+}
+
+.oauth-bsm {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: .5rem 1rem;
+    color: rgb(96, 96, 96);
+    background-color: white;
+    border-radius: 1rem;
+}
+
+.oauth-bsm img {
+    height: 30px;
+    padding: .5rem 0;
+}
+
+.oauth-bsm span {
+    font-size: 1.3rem;
+    font-weight: bold;
 }
