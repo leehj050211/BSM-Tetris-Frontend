@@ -1,17 +1,17 @@
 import React from "react";
 import { Socket } from "socket.io-client";
+import { User } from "../../types/user";
 import MyRanking from "../ranking/myranking";
 
 interface PropsType {
     socket: Socket,
-    isLogin: boolean,
-    setIsLogin: React.Dispatch<React.SetStateAction<boolean>>,
-    setPageMode: React.Dispatch<React.SetStateAction<string>>,
-    setUsername: React.Dispatch<React.SetStateAction<string>>
+    user: User,
+    setUser: React.Dispatch<React.SetStateAction<User>>,
+    setPageMode: React.Dispatch<React.SetStateAction<string>>
 }
 
 const TitleScreen: React.FC<PropsType> = (props: PropsType) => {
-    const { socket, isLogin, setIsLogin, setPageMode, setUsername } = props;
+    const { socket, user, setUser, setPageMode } = props;
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     React.useEffect(() => {
@@ -35,7 +35,10 @@ const TitleScreen: React.FC<PropsType> = (props: PropsType) => {
         socket.emit('join', {username: username});
         
         socket.on('room:join', (data: {username: string}) => {
-            setUsername(() => data.username);
+            setUser(prev => ({
+                ...prev,
+                username: data.username
+            }));
             setPageMode('match');
         });
     }
@@ -53,7 +56,7 @@ const TitleScreen: React.FC<PropsType> = (props: PropsType) => {
                 />
                 <button>게임 시작</button>
             </form>
-            <MyRanking isLogin={isLogin} setIsLogin={setIsLogin} />
+            <MyRanking user={user} setUser={setUser} />
         </div>
     );
 }

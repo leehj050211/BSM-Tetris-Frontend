@@ -4,11 +4,12 @@ import { Socket } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import { Game } from '../../util/game';
 import PlayerScreen from './player';
+import { User } from '../../types/user';
 
 interface PropsType {
     socket: Socket,
-    username: string,
-    setUsername: React.Dispatch<React.SetStateAction<string>>
+    user: User,
+    setUser: React.Dispatch<React.SetStateAction<User>>
 }
 
 interface GameInfo {
@@ -18,6 +19,7 @@ interface GameInfo {
 }
 
 const GameComponent: React.FC<PropsType> = (props: PropsType) => {
+    const { user } = props;
     const game = new Game();
     const { socket } = props;
     const navigate = useNavigate();
@@ -38,11 +40,11 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
         init();
     }, []);
     const init = () => {
-        playerCanvasRef[props.username] = canvasRefs.current[0];
+        playerCanvasRef[user.username] = canvasRefs.current[0];
 
         window.addEventListener('resize', () => {
             if (canvasRefs.current[0].current) {
-                game.resizeScreen(canvasRefs.current[0].current, props.username);
+                game.resizeScreen(canvasRefs.current[0].current, user.username);
             }
         });
 
@@ -53,7 +55,7 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
                 tick: data.tick
             });
 
-            const players = data.players.filter((username: string) => username !== props.username);
+            const players = data.players.filter((username: string) => username !== user.username);
             setPlayerListEl(() => players.map((username: string, i: number) => {
                 const newCanvasRef = React.createRef<HTMLCanvasElement>();
                 canvasRefs.current[i+1] = newCanvasRef;
@@ -240,7 +242,7 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
                     onKeyDown={gameKeyDownHandler}
                     className='game--controller'
                 />
-                <p className='game--player-username'>{props.username}</p>
+                <p className='game--player-username'>{user.username}</p>
             </div>
             <ul className='game--player-list'>{playerListEl}</ul>
         </div>

@@ -1,15 +1,16 @@
 import React from "react";
 import axios, { AxiosPromise, AxiosError } from 'axios';
 import { ViewRankingType } from "../../types/view-ranking";
+import { User } from "../../types/user";
 
 interface PropsType {
-    isLogin: boolean,
-    setIsLogin: React.Dispatch<React.SetStateAction<boolean>>
+    user: User,
+    setUser: React.Dispatch<React.SetStateAction<User>>
 }
 
 
 const MyRanking: React.FC<PropsType> = (props: PropsType) => {
-    const { isLogin, setIsLogin } = props;
+    const { user, setUser } = props;
     const [myRanking, setMyRanking] = React.useState<ViewRankingType>();
 
     React.useEffect(() => {
@@ -19,10 +20,9 @@ const MyRanking: React.FC<PropsType> = (props: PropsType) => {
         (async () => {
             try {
                 setMyRanking((await getMyRanking()).data);
-                setIsLogin(true);
             } catch (error) {
                 if (error instanceof AxiosError && error.response?.status == 401) {
-                    setIsLogin(false);
+                    setUser(prev => ({...prev, isLogin: false}));
                 }
             }
         })();
@@ -51,7 +51,7 @@ const MyRanking: React.FC<PropsType> = (props: PropsType) => {
 
     return (
         <div className="my-rank">{
-            isLogin?
+            user.isLogin?
             myRankingEl():
             (<div>
                 <p>랭킹서비스를 이용하기위해 로그인이 필요합니다</p>

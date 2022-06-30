@@ -1,4 +1,5 @@
 .ranking-main {
+    padding-top: 10rem;
     display: flex;
     justify-content: center;
 }
@@ -37,6 +38,9 @@
     height: 6rem;
     border-radius: 50%;
     background-color: var(--level-2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .ranking-list .ranking--username {

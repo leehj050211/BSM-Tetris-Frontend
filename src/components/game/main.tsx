@@ -4,39 +4,43 @@ import { io } from 'socket.io-client';
 import TitleScreen from "./title-screen";
 import Match from "./match";
 import Game from "./game";
+import { User } from "../../types/user";
 
 const socket = io('/', {
     transports: ['websocket']
 });
 
-const GameMain: React.FC = () => {
+interface PropsType {
+    user: User,
+    setUser: React.Dispatch<React.SetStateAction<User>>
+}
+
+const GameMain: React.FC<PropsType> = (props: PropsType) => {
+    const { user, setUser } = props;
     const [pageMode, setPageMode] = React.useState<string>('title');
-    const [isLogin, setIsLogin] = React.useState<boolean>(false);
-    const [username, setUsername] = React.useState<string>('');
     
     const rederPage = (pageMode: string): JSX.Element => {
         switch (pageMode) {
             case 'title': {
                 return (<TitleScreen
                             socket={socket}
-                            isLogin={isLogin}
-                            setIsLogin={setIsLogin}
-                            setUsername={setUsername}
+                            user={user}
+                            setUser={setUser}
                             setPageMode={setPageMode}
                         />);
             }
             case 'match': {
                 return (<Match
                             socket={socket}
-                            username={username}
+                            user={user}
                             setPageMode={setPageMode}
                         />);
             }
             case 'game': {
                 return (<Game 
                             socket={socket}
-                            username={username}
-                            setUsername={setUsername}
+                            user={user}
+                            setUser={setUser}
                         />);
             }
             default: {

@@ -2,16 +2,17 @@ import React from "react";
 import '../../styles/game/match.css';
 import { Socket } from "socket.io-client";
 import { User } from "../../types/user";
+import { Players } from "../../types/players";
 
 interface PropsType {
     socket: Socket,
-    username: string,
+    user: User,
     setPageMode: React.Dispatch<React.SetStateAction<string>>
 }
 
 const Match: React.FC<PropsType> = (props: PropsType) => {
     const { socket } = props;
-    const [users, setUsers] = React.useState<User[]>([]);
+    const [players, setPlayers] = React.useState<Players[]>([]);
     const [roomInfo, setRoomInfo] = React.useState<{
         roomId: string,
         maxPlayers: number
@@ -23,8 +24,8 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
     const [playerListEl, setPlayerListEl] = React.useState<JSX.Element[]>([]);
 
     React.useEffect(() => {
-        setPlayerListEl(() => users.map((user, i) => (<li key={i}><span className="match--player-name">{user.username}</span></li>)));
-    }, [users]);
+        setPlayerListEl(() => players.map((user, i) => (<li key={i}><span className="match--player-name">{user.username}</span></li>)));
+    }, [players]);
     
     React.useEffect(() => {
         init();
@@ -36,19 +37,19 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
                 roomId: data.roomId,
                 maxPlayers: data.maxPlayers
             });
-            setUsers(data.players.map((user: string) => ({username: user})));
+            setPlayers(data.players.map((player: string) => ({username: player})));
         });
         
         socket.on('room:player-join', username => {
-            setUsers((prev) => [
+            setPlayers((prev) => [
                 ...prev,
                 {username}
             ]);
         });
         
         socket.on('player:exit', username => {
-            setUsers((prev) => {
-                prev = prev.filter(user => user.username != username);
+            setPlayers((prev) => {
+                prev = prev.filter(player => player.username != username);
                 return prev;
             });
         });
@@ -71,7 +72,7 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
     return (
         <div className="match">
             <div className="match--stat-box">
-                <h4>{ready? '잠시 후 게임이 시작됩니다.': '플레이어를 기다리는 중...'} ({users.length}/{roomInfo.maxPlayers})</h4>
+                <h4>{ready? '잠시 후 게임이 시작됩니다.': '플레이어를 기다리는 중...'} ({players.length}/{roomInfo.maxPlayers})</h4>
             </div>
             <ul className="match--player-list">
                 {playerListEl}

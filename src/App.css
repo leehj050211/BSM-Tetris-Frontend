@@ -1,12 +1,11 @@
 .App {
-  text-align: center;
-  height: 100%;
-  background-color: var(--background);
-  color: var(--text);
+    text-align: center;
+    height: 100%;
+    background-color: var(--background);
+    color: var(--text);
 }
 
 .App {
-    --black: #000;
     --gray: #c0c0c0;
     --light_gray:#aaa;
     
@@ -22,9 +21,9 @@
 
     --input:  rgba(192, 192, 192, .3);
     --hover:  rgba(0, 0, 0, .2);
+    --svg: #000000;
 }
 .App.dark {
-    --black: #000;
     --gray: #525252;
     --light_gray:#aaa;
 
@@ -40,6 +39,7 @@
 
     --input:  rgba(192, 192, 192, .3);
     --hover: rgba(128, 128, 128, .2);
+    --svg: #FFFFFF
 }
 
 ul,

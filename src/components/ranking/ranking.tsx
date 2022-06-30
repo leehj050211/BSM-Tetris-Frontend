@@ -3,9 +3,15 @@ import axios, { AxiosPromise, AxiosError } from 'axios';
 import { ViewRankingType } from "../../types/view-ranking";
 import MyRanking from "./myranking";
 import '../../styles/ranking/ranking.css';
+import { User } from "../../types/user";
 
-const RankingScreen: React.FC = () => {
-    const [isLogin, setIsLogin] = React.useState<boolean>(false);
+interface PropsType {
+    user: User,
+    setUser: React.Dispatch<React.SetStateAction<User>>
+}
+
+const RankingScreen: React.FC<PropsType> = (props: PropsType) => {
+    const { user, setUser } = props;
     const [rankingList, setRankingList] = React.useState<ViewRankingType[]>();
 
     React.useEffect(() => {
@@ -17,7 +23,7 @@ const RankingScreen: React.FC = () => {
                 setRankingList((await getRankingList()).data);
             } catch (error) {
                 if (error instanceof AxiosError && error.response?.status == 401) {
-                    setIsLogin(false);
+                    setUser(prev => ({...prev, isLogin: false}));
                 }
             }
         })();
@@ -51,7 +57,7 @@ const RankingScreen: React.FC = () => {
             <ul className="ranking-list">
                 {rankingEl()}
             </ul>
-            <MyRanking isLogin={isLogin} setIsLogin={setIsLogin} />
+            <MyRanking user={user} setUser={setUser} />
         </div>
     );
 }

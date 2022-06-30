@@ -36,8 +36,8 @@
 
 .game--player-screen
 .game--canvas-wrap {
-    max-width: 350px;
-    max-height: 700px;
+    max-width: 325px;
+    max-height: 650px;
 }
 
 :is(
