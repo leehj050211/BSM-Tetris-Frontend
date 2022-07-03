@@ -1,7 +1,7 @@
 import React from "react";
 import { Socket } from "socket.io-client";
 import { User } from "../../types/user";
-import MyRanking from "../ranking/myranking";
+import MyRanking from "../ranking/my-ranking";
 
 interface PropsType {
     socket: Socket,

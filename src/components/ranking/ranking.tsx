@@ -1,7 +1,7 @@
 import React from "react";
 import axios, { AxiosPromise, AxiosError } from 'axios';
 import { ViewRankingType } from "../../types/view-ranking";
-import MyRanking from "./myranking";
+import MyRanking from "./my-ranking";
 import '../../styles/ranking/ranking.css';
 import { User } from "../../types/user";
 

@@ -33,6 +33,10 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
     const init = () => {
         socket.emit('room:info');
         socket.on('room:info', data => {
+            // 이미 게임이 진행중인 방이라면
+            if (data.init) {
+                return props.setPageMode('game');
+            }
             setRoomInfo({
                 roomId: data.roomId,
                 maxPlayers: data.maxPlayers

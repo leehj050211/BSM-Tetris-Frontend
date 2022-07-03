@@ -40,7 +40,19 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
         init();
     }, []);
     const init = () => {
-        playerCanvasRef[user.username] = canvasRefs.current[0];
+        (() => {
+            playerCanvasRef[user.username] = canvasRefs.current[0];
+            const playerCanvas = playerCanvasRef[user.username].current;
+            if (!playerCanvas) return;
+            // 캔버스 컨텍스트 참조
+            const ctx = playerCanvas.getContext('2d');
+            if (ctx) {
+                game.initData(user.username);
+                game.setCtx(user.username, ctx);
+                game.resizeScreen(playerCanvas, user.username);
+            }
+            game.resizeScreen(playerCanvas, user.username);
+        })();
 
         window.addEventListener('resize', () => {
             if (canvasRefs.current[0].current) {
@@ -56,40 +68,18 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
             });
 
             const players = data.players.filter((username: string) => username !== user.username);
-            setPlayerListEl(() => players.map((username: string, i: number) => {
-                const newCanvasRef = React.createRef<HTMLCanvasElement>();
-                canvasRefs.current[i+1] = newCanvasRef;
-                setPlayerCanvasRef(prev => {
-                    prev[username] = newCanvasRef;
-                    return prev;
+            setPlayerListEl(() => {
+                return players.map((username: string, i: number) => {
+                    return createPlayerScreen(username, i);
                 });
-                return <PlayerScreen 
-                            key={username}
-                            username={username}
-                            ranking={0}
-                            canvasRef={newCanvasRef}
-                        />
-            }));
+            });
+        });
 
-            setTimeout(() => {
-                Object.keys(playerCanvasRef).forEach(username => {
-                    canvasRefs.current.forEach(ref => {
-                        if (ref !== playerCanvasRef[username]) {
-                            return;
-                        }
-                        if (!ref.current?.parentElement?.clientWidth) {
-                            return;
-                        }
-                        // 캔버스 컨텍스트 참조
-                        const ctx = ref.current.getContext('2d');
-                        if (ctx) {
-                            game.initData(username);
-                            game.setCtx(username, ctx);
-                            game.resizeScreen(ref.current, username);
-                        }
-                    })
-                })
-            }, 1);
+        socket.on('room:player-join', (username: string) => {
+            setPlayerListEl(prev => [
+                ...prev,
+                createPlayerScreen(username, canvasRefs.current.length-1)
+            ]);
         });
 
         socket.on('player:exit', (username: string) => {
@@ -161,6 +151,37 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
             }
             alert(data);
         });
+    }
+
+    const createPlayerScreen = (username: string, i: number): JSX.Element => {
+        const newCanvasRef = React.createRef<HTMLCanvasElement>();
+        canvasRefs.current[i+1] = newCanvasRef;
+        setPlayerCanvasRef(prev => {
+            prev[username] = newCanvasRef;
+            return prev;
+        });
+
+        setTimeout(() => {
+            if (!newCanvasRef.current?.parentElement?.clientWidth) {
+                return;
+            }
+            // 캔버스 컨텍스트 참조
+            const ctx = newCanvasRef.current.getContext('2d');
+            if (ctx) {
+                game.initData(username);
+                game.setCtx(username, ctx);
+                game.resizeScreen(newCanvasRef.current, username);
+            }
+        }, 10);
+
+        return (
+            <PlayerScreen 
+                key={username}
+                username={username}
+                ranking={0}
+                canvasRef={newCanvasRef}
+            />
+        );
     }
 
     React.useEffect(() => {
