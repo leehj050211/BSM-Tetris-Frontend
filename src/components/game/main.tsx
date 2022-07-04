@@ -16,6 +16,12 @@ interface PropsType {
 }
 
 const GameMain: React.FC<PropsType> = (props: PropsType) => {
+    React.useEffect(() => {
+        socket.connect();
+        return () => {
+            socket.disconnect();
+        }
+    }, []);
     const { user, setUser } = props;
     const [pageMode, setPageMode] = React.useState<string>('title');
     

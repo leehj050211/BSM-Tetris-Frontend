@@ -29,6 +29,13 @@ export class Game {
         this.draw(canvas, this.renderPiece(this.gameDatas[username]));
     }
 
+    resetScreen(username: string) {
+        this.initData(username);
+        const canvas = this.playerCanvas[username];
+        const { ctx } = canvas;
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    }
+
     initData(username: string) {
         this.gameDatas[username] = new UserGameData();
         // 게임 보드 배열 초기화

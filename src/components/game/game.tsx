@@ -93,6 +93,7 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
         
         socket.on('game:start', () => {
             setStart(() => true);
+            game.resetScreen(user.username);
         });
 
         socket.on('game:spawn', data => {
@@ -132,6 +133,9 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
         socket.on('game:gameover', data => {
             if (data.tick !== gameInfo.tick) {
                 setGameInfo(prev => ({...prev, tick: data.tick}));
+            }
+            if (data.username == user.username) {
+                setStart(false);
             }
             game.stack(data.username, data.board);
             game.ranking(data.username, data.ranking);
