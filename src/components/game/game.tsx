@@ -260,6 +260,7 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
             <div className='game--player-screen'>
                 <div className='game--canvas-wrap'>
                     <canvas className='game--screen' ref={canvasRefs.current[0]}></canvas>
+                    <p className='game--player-username'>{user.username}</p>
                 </div>
                 <input
                     readOnly 
@@ -267,7 +268,6 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
                     onKeyDown={gameKeyDownHandler}
                     className='game--controller'
                 />
-                <p className='game--player-username'>{user.username}</p>
             </div>
             <ul className='game--player-list'>{playerListEl}</ul>
         </div>

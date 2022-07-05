@@ -12,8 +12,8 @@ const PlayerScreen: React.FC<PropsType> = (props: PropsType) => {
             <div className='game--other-player-screen'>
                 <div className='game--canvas-wrap'>
                     <canvas className='game--screen' ref={props.canvasRef}></canvas>
+                    <p className='game--player-username'>{props.username}</p>
                 </div>
-                <p className='game--player-username'>{props.username}</p>
             </div>
         </li>
     );
