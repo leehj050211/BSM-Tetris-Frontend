@@ -58,7 +58,11 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
             });
         });
 
-        socket.on('game:ready', data => {
+        socket.on('room:skip', () => {
+            props.setPageMode('game');
+        });
+
+        socket.on('game:ready', () => {
             setReady(() => true);
             setTimeout(() => {
                 props.setPageMode('game');
@@ -73,10 +77,22 @@ const Match: React.FC<PropsType> = (props: PropsType) => {
         });
     }
 
+    const skipMatch = () => {
+        socket.emit('room:skip');
+    }
+
     return (
         <div className="match">
             <div className="match--stat-box">
                 <h4>{ready? '잠시 후 게임이 시작됩니다.': '플레이어를 기다리는 중...'} ({players.length}/{roomInfo.maxPlayers})</h4>
+                {
+                    !ready?
+                    <>
+                        <br />
+                        <button onClick={skipMatch}>매칭 스킵</button>
+                    </>:
+                    null
+                }
             </div>
             <ul className="match--player-list">
                 {playerListEl}

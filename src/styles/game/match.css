@@ -6,7 +6,8 @@
     align-items: center;
 }
 
-.match--stat-box {
+.match--stat-box
+h4 {
     padding: 2rem;
     border-radius: 1rem;
     background-color: var(--level-2);
