@@ -18,6 +18,13 @@ interface GameInfo {
     tick: number
 }
 
+const keyInterval: {
+    [index: string]: {
+        interval: NodeJS.Timer,
+        isPress: boolean
+    }
+} = {};
+
 const GameComponent: React.FC<PropsType> = (props: PropsType) => {
     const { user } = props;
     const game = new Game();
@@ -193,55 +200,90 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
         controllerRef.current?.focus();
     }, [start]);
 
-    const gameKeyDownHandler = (event: React.KeyboardEvent) => {
-        switch (event.key) {
+    const gameControll = (key: string): boolean => {
+        switch (key) {
             case 'ArrowLeft': {
                 socket.emit('game', {
                     action: 'move',
                     data: 'left'
                 });
-                break;
+                return true;
             }
             case 'ArrowRight': {
                 socket.emit('game', {
                     action: 'move',
                     data: 'right'
                 });
-                break;
+                return true;
             }
             case 'ArrowDown': {
                 socket.emit('game', {
                     action: 'move',
                     data: 'down'
                 });
-                break;
+                return true;
             }
             case 'z': {
                 socket.emit('game', {
                     action: 'rotate',
                     data: 'left'
                 });
-                break;
+                return true;
             }
             case 'x': {
                 socket.emit('game', {
                     action: 'rotate',
                     data: 'right'
                 });
-                break;
+                return true;
             }
             case 'c': {
                 socket.emit('game', {
                     action: 'change'
                 });
-                break;
+                return true;
             }
             case ' ': {
                 socket.emit('game', {
                     action: 'harddrop'
                 });
-                break;
+                return true;
             }
+        }
+        return false;
+    }
+
+    const keyDownHandler = (event: React.KeyboardEvent) => {
+        if (keyInterval[event.key]?.isPress) return;
+        if (!gameControll(event.key)) return;
+        keyInterval[event.key] = {
+            interval: setTimeout(() => {}, 0),
+            isPress: true
+        }
+        const [delay, interval] = [
+            'ArrowLeft', 'ArrowRight', 'ArrowDown'
+        ].includes(event.key)? [75, 25]: [150, 200];
+
+        setTimeout(() => {
+            if (!keyInterval[event.key]?.isPress) {
+                return;
+            }
+            keyInterval[event.key] = {
+                interval: setInterval(() => {
+                    if (!keyInterval[event.key]?.isPress) {
+                        return clearInterval(keyInterval[event.key].interval);
+                    }
+                    gameControll(event.key);
+                }, interval),
+                isPress: true
+            }
+        }, delay);
+    }
+
+    const keyUpHandler = (event: React.KeyboardEvent) => {
+        if (keyInterval[event.key]?.isPress) {
+            keyInterval[event.key].isPress = false;
+            clearInterval(keyInterval[event.key].interval);
         }
     }
 
@@ -265,7 +307,8 @@ const GameComponent: React.FC<PropsType> = (props: PropsType) => {
                 <input
                     readOnly 
                     ref={controllerRef} 
-                    onKeyDown={gameKeyDownHandler}
+                    onKeyDown={keyDownHandler}
+                    onKeyUp={keyUpHandler}
                     className='game--controller'
                 />
             </div>
