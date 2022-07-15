@@ -1,6 +1,7 @@
 .App {
     text-align: center;
     height: 100%;
+    overflow: auto;
     background-color: var(--background);
     color: var(--text);
 }
@@ -112,6 +113,17 @@ input {
     background-color: var(--input);
     text-align: left;
     transition: .25s;
+}
+
+.scroll-bar::-webkit-scrollbar {
+    width: 2rem;
+    height: 2rem;
+}
+.scroll-bar::-webkit-scrollbar-thumb {
+    background-color: var(--text-level-1);
+    border-radius: 1rem;
+    border: .8rem solid transparent;
+    background-clip: padding-box;
 }
 
 .oauth-bsm {

@@ -14,7 +14,7 @@ function App() {
     });
 
     return (
-        <div className="App dark">
+        <div className="App dark scroll-bar">
             <BrowserRouter>
                 <Header user={user} setUser={setUser} />
                 <Routes>
