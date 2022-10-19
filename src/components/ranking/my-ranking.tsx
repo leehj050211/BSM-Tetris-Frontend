@@ -55,7 +55,7 @@ const MyRanking: React.FC<PropsType> = (props: PropsType) => {
             myRankingEl():
             (<div>
                 <p>랭킹서비스를 이용하기위해 로그인이 필요합니다</p>
-                <a className="oauth-bsm" href="https://bssm.kro.kr/oauth/login?clientId=e2ea87b3&redirectURI=https://tetris.bssm.kro.kr/api/user/oauth/bsm">
+                <a className="oauth-bsm" href="https://auth.bssm.kro.kr/oauth?clientId=72f5ef2e&redirectURI=https://tetris.bssm.kro.kr/api/user/oauth/bsm">
                     <img src="/images/bsm-icon.png" alt="bsm-icon"/>
                     <span>BSM 계정으로 계속</span>
                 </a>
